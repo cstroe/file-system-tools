@@ -1,6 +1,16 @@
 *.class
 *.log
-.idea
+/.idea/
+/*.iml
 target
 external_hard_drive*
 .jvmopts
+
+# IntelliJ
+/.idea/
+/*.iml
+/out/
+
+# Gradle
+/.gradle/
+/build/
