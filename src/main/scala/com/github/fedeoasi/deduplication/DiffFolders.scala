@@ -1,14 +1,17 @@
-package com.github.fedeoasi
+package com.github.fedeoasi.deduplication
 
-import com.github.fedeoasi.FolderComparison.FolderDiff
 import com.github.fedeoasi.Model._
+import com.github.fedeoasi.catalog.EntryPersistence
 import com.github.fedeoasi.cli.{CatalogConfig, CatalogConfigParsing, CliCommand}
+import com.github.fedeoasi.output.Logging
+import com.github.fedeoasi.deduplication.FolderComparison.FolderDiff
+import com.github.fedeoasi.spark.SparkSupport
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 
 object DiffFolders extends FolderComparison with Logging {
   def diff(sc: SparkContext, entries: Seq[FileSystemEntry]): Seq[FolderDiff] = {
-    val foldersAndFiles = folderAndNestedFiles(sc.parallelize(entries))
+    val foldersAndFiles = folderAndNestedFileRdd(sc.parallelize(entries))
 
     val duplicateFoldersByName = foldersAndFiles.groupBy(_._1.name).filter(_._2.size > 1)
 
@@ -31,7 +34,7 @@ object DiffFolders extends FolderComparison with Logging {
     d1.path.contains(d2.path) || d2.path.contains(d1.path)
   }
 
-  def folderAndNestedFiles(entries: RDD[FileSystemEntry]): RDD[(DirectoryEntry, Iterable[FileEntry])] = {
+  def folderAndNestedFileRdd(entries: RDD[FileSystemEntry]): RDD[(DirectoryEntry, Iterable[FileEntry])] = {
     val files = entries.collect { case f: FileEntry => f }
     val directories = entries.collect { case d: DirectoryEntry => (d.path, d) }
     val ancestorsAndFiles = files.flatMap { file => file.ancestors.map((_, file)) }

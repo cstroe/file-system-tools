@@ -1,13 +1,17 @@
 package com.github.fedeoasi.cli
 
-import com.github.fedeoasi._
+import com.github.fedeoasi.catalog._
+import com.github.fedeoasi.deduplication._
+import com.github.fedeoasi.search._
+import com.github.fedeoasi.statistics._
 
 object CliMain {
   val commands: Map[String, List[CliAware]] = Map(
     "Catalog creation and update" -> List(GenerateCatalog, DeletionChecker, MergeCatalogs),
     "Lookup" -> List(FolderByName, FindFileByMd5, FoldersContainingExtension),
-    "Finding duplicates" -> List(DuplicateFilesFinder, FolderSimilarity, FindIdenticalFolders, FindSimilarFolders, FindDuplicateFilesWithinSecondaryFolder),
-    "Catalog statistics" -> List(FilesBySize, ExtensionsByFileCount)
+    "Finding duplicates" -> List(DuplicateFilesFinder, FolderPairSimilarity, FolderSimilarity, FindIdenticalFolders,
+      FindDuplicateFilesWithinSecondaryFolder),
+    "Catalog statistics" -> List(ExtensionsByFileCount, FilesBySize, FoldersByFileCount, FoldersByFileSize)
   )
 
   def main(args: Array[String]): Unit = {

@@ -1,4 +1,4 @@
-package com.github.fedeoasi
+package com.github.fedeoasi.catalog
 
 import java.nio.file.{Path, Paths}
 import java.util.function.Consumer
@@ -7,6 +7,8 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.github.fedeoasi.Model.FileSystemEntry
 import com.github.fedeoasi.cli.{CliAware, CliCommand}
+import com.github.fedeoasi.output.Logging
+import com.github.fedeoasi.utils.FileSystemWalk
 import scopt.OptionParser
 
 object GenerateCatalog extends Logging with CliAware {
@@ -42,25 +44,19 @@ object GenerateCatalog extends Logging with CliAware {
 
     implicit val system: ActorSystem = ActorSystem("GenerateCatalog")
     implicit val materializer: ActorMaterializer = ActorMaterializer()
-    try {
+    val readEntriesCount = try {
       new FileSystemWalk(inputFolder, existingEntryIndex, populateMd5).traverse(entryWriterConsumer)
     } finally {
       system.terminate()
     }
     val readEntries = new EntryReader(catalogFile).count()
-    GenerateCatalogReport(entryWriterConsumer.entriesCount, readEntries)
+    GenerateCatalogReport(readEntriesCount, readEntries)
   }
 
   class EntryWriterConsumer(catalogPath: Path) extends Consumer[FileSystemEntry] {
-    private var _entriesCount = 0
     private val writer = new EntryWriter(catalogPath)
 
-    override def accept(t: FileSystemEntry): Unit = {
-      _entriesCount += 1
-      writer.write(t)
-    }
-
-    def entriesCount: Int = _entriesCount
+    override def accept(t: FileSystemEntry): Unit = writer.write(t)
   }
 
   /** Generate catalog for a folder and dump it to a file (defaults to external_hard_drive.csv). */

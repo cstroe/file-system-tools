@@ -1,10 +1,15 @@
-package com.github.fedeoasi
+package com.github.fedeoasi.deduplication
 
 import java.nio.file.{Path, Paths}
 
 import com.github.fedeoasi.Model.{FileEntries, FileEntry, FileSystemEntry}
+<<<<<<< HEAD:src/main/scala/com/github/fedeoasi/DuplicateFilesFinder.scala
+=======
+import com.github.fedeoasi.catalog.EntryPersistence
+>>>>>>> 8b7b88506d190f2bf042178bcf351f41204fbb6e:src/main/scala/com/github/fedeoasi/deduplication/DuplicateFilesFinder.scala
 import com.github.fedeoasi.cli.{CliAware, CliCommand}
 import com.github.fedeoasi.collection.TopKFinder
+import com.github.fedeoasi.output.Logging
 import scopt.OptionParser
 
 class DuplicateFilesFinder(entries: Seq[FileSystemEntry], folder: Option[Path] = None) extends Logging {
